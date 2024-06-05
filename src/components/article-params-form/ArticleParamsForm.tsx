@@ -28,12 +28,32 @@ export const ArticleParamsForm = ({
 	changeStyleHandler,
 }: FormProps) => {
 	// Открытие и закрытие панели через замену стилей
-	const [open, setOpen] = useState(false);
+	const [isMenuOpen, setMenuOpen] = useState(false);
 
 	const menuStyle = clsx({
 		[styles.container]: true,
-		[styles.container_open]: open, // будет добавлен только когда open === true
+		[styles.container_open]: isMenuOpen, // будет добавлен только когда open === true
 	});
+
+	// Закрытие панели по клику снаружи
+	const ref = useRef<HTMLElement | null>(null);
+
+	useEffect(() => {
+		if (!isMenuOpen) return;
+
+		const handleOutsideClick = (event: MouseEvent) => {
+			const target = event.target as HTMLElement;
+			if (ref.current && !ref.current.contains(target)) {
+				setMenuOpen(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleOutsideClick);
+
+		return () => {
+			document.removeEventListener('mousedown', handleOutsideClick);
+		};
+	}, [{ isMenuOpen, setMenuOpen }]);
 
 	// Состояния отдельных элементов формы
 	const [fontFamily, setFontFamily] = useState(articleStyle.fontFamilyOption);
@@ -67,27 +87,12 @@ export const ArticleParamsForm = ({
 		changeStyleHandler(defaultArticleState);
 	};
 
-	// Закрытие панели по клику снаружи
-	const ref = useRef<HTMLElement | null>(null);
-
-	useEffect(() => {
-		function click(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (ref.current && !ref.current.contains(target)) {
-				setOpen(open);
-			}
-		}
-
-		document.addEventListener('mousedown', click);
-
-		return () => {
-			document.removeEventListener('mousedown', click);
-		};
-	}, []);
-
 	return (
 		<>
-			<ArrowButton open={open} handleClick={() => setOpen(!open)} />
+			<ArrowButton
+				open={isMenuOpen}
+				handleClick={() => setMenuOpen(!isMenuOpen)}
+			/>
 			<aside className={menuStyle} ref={ref}>
 				<form
 					className={styles.form}
