@@ -53,7 +53,7 @@ export const ArticleParamsForm = ({
 		return () => {
 			document.removeEventListener('mousedown', handleOutsideClick);
 		};
-	}, [{ isMenuOpen, setMenuOpen }]);
+	}, [ isMenuOpen ]);
 
 	// Состояния отдельных элементов формы
 	const [fontFamily, setFontFamily] = useState(articleStyle.fontFamilyOption);
